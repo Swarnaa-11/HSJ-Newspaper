@@ -4,7 +4,6 @@
   <meta charset="utf-8">
   <title>HSJ AR Experience</title>
 
-  <!-- Libraries -->
   <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.2/dist/mindar-image-aframe.prod.js"></script>
 
@@ -15,7 +14,7 @@
       overflow: hidden;
       height: 100%;
       width: 100%;
-      background: black;
+      background: transparent;
     }
 
     a-scene {
@@ -25,21 +24,39 @@
       background: transparent !important;
     }
 
-    #loading {
+    #startButton {
       position: fixed;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      color: white;
+      padding: 14px 22px;
+      background: white;
+      color: black;
       font-size: 16px;
+      border-radius: 8px;
       z-index: 999;
+      border: none;
+    }
+
+    .instructions {
+      position: fixed;
+      bottom: 20px;
+      width: 100%;
+      text-align: center;
+      color: white;
+      font-size: 14px;
+      z-index: 10;
     }
   </style>
 </head>
 
 <body>
 
-<div id="loading">Loading AR Experience...</div>
+<button id="startButton">Start AR Experience</button>
+
+<div class="instructions">
+  Tap start → Point camera at the newspaper
+</div>
 
 <a-scene
   mindar-image="imageTargetSrc: target.mind;"
@@ -49,9 +66,7 @@
   renderer="antialias: false; alpha: true; precision: mediump;"
 >
 
-  <a-assets timeout="10000">
-
-    <!-- 🔥 OPTIMIZED VIDEO -->
+  <a-assets>
     <video
       id="vid"
       src="video.mp4"
@@ -62,7 +77,6 @@
       preload="auto"
       crossorigin="anonymous"
     ></video>
-
   </a-assets>
 
   <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
@@ -72,10 +86,11 @@
     mindar-image-target-smoothing="enabled: true; filterMinCF: 0.0001; filterBeta: 0.01"
   >
 
+    <!-- ✅ 5% increased size -->
     <a-video
       src="#vid"
-      width="0.84"
-      height="0.475"
+      width="0.9261"
+      height="0.5237"
       position="0 0 0"
       material="shader: flat;"
     ></a-video>
@@ -85,26 +100,19 @@
 </a-scene>
 
 <script>
-  const video = document.querySelector("#vid");
-  const loading = document.querySelector("#loading");
+  const startButton = document.querySelector("#startButton");
   const scene = document.querySelector("a-scene");
+  const video = document.querySelector("#vid");
 
-  // 🔥 START AR IMMEDIATELY (no button delay)
-  scene.addEventListener("loaded", async () => {
+  startButton.addEventListener("click", async () => {
     const mindarSystem = scene.systems["mindar-image-system"];
     await mindarSystem.start();
-
-    loading.style.display = "none";
+    video.play().catch(() => {});
+    startButton.style.display = "none";
   });
 
-  // 🔥 PLAY ONLY WHEN TARGET FOUND (saves performance)
-  scene.addEventListener("targetFound", () => {
-    video.play();
-  });
-
-  scene.addEventListener("targetLost", () => {
-    video.pause();
-  });
+  scene.addEventListener("targetFound", () => video.play());
+  scene.addEventListener("targetLost", () => video.pause());
 </script>
 
 </body>
