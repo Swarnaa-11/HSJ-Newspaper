@@ -26,18 +26,33 @@
       z-index: 1;
     }
 
-    /* VIDEO OVERLAY */
+    /* VIDEO OVERLAY (DEFAULT = PORTRAIT / AUTO MODE) */
     #overlayVideo {
       position: fixed;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      width: 100vw;
+
+      width: 95vw;
       height: auto;
-      max-height: 100vh;
+
+      aspect-ratio: 16 / 9;
+
+      max-height: 85vh;
+
       object-fit: contain;
       z-index: 2;
       border-radius: 14px;
+    }
+
+    /* LANDSCAPE MODE FIX */
+    @media (orientation: landscape) {
+      #overlayVideo {
+        width: auto;
+        height: 90vh;
+        max-height: 90vh;
+        aspect-ratio: auto;
+      }
     }
 
     /* TAP SCREEN */
@@ -106,7 +121,7 @@
   tapLayer.addEventListener("click", async () => {
     tapLayer.style.display = "none";
 
-    // 🔥 FULLSCREEN (required for landscape)
+    // FULLSCREEN
     const elem = document.documentElement;
     if (elem.requestFullscreen) {
       try {
@@ -116,7 +131,7 @@
       }
     }
 
-    // 🔥 TRY LANDSCAPE LOCK
+    // ORIENTATION LOCK
     if (screen.orientation && screen.orientation.lock) {
       try {
         await screen.orientation.lock("landscape");
@@ -125,7 +140,7 @@
       }
     }
 
-    // 🔥 START CAMERA
+    // CAMERA
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         video: { facingMode: "environment" },
@@ -136,7 +151,7 @@
       alert("Please allow camera access");
     }
 
-    // 🔥 AUDIO FIX (reliable method)
+    // VIDEO PLAY FIX
     try {
       overlayVideo.muted = true;
       await overlayVideo.play();
