@@ -4,7 +4,6 @@
   <meta charset="utf-8">
   <title>HSJ AR Experience</title>
 
-  <!-- Libraries -->
   <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.2/dist/mindar-image-aframe.prod.js"></script>
 
@@ -21,29 +20,8 @@
 
     a-scene {
       position: fixed !important;
-      top: 0;
-      left: 0;
       width: 100% !important;
       height: 100% !important;
-    }
-
-    canvas {
-      width: 100% !important;
-      height: 100% !important;
-    }
-
-    #startButton {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      padding: 14px 22px;
-      background: white;
-      color: black;
-      font-size: 16px;
-      border-radius: 8px;
-      z-index: 999;
-      border: none;
     }
 
     .instructions {
@@ -60,75 +38,84 @@
 
 <body>
 
-  <!-- Start Button -->
-  <button id="startButton">Start AR Experience</button>
+<div class="instructions">
+  कैमरा खुलते ही पेपर की तरफ करें
+</div>
 
-  <!-- Instructions -->
-  <div class="instructions">
-    Tap start → Point camera at the newspaper
-  </div>
+<a-scene
+  mindar-image="imageTargetSrc: target.mind;"
+  embedded
+  vr-mode-ui="enabled: false"
+  device-orientation-permission-ui="enabled: true"
+  renderer="antialias: false; alpha: true; precision: mediump;"
+>
 
-  <!-- AR Scene -->
-  <a-scene
-    mindar-image="imageTargetSrc: target.mind;"
-    embedded
-    vr-mode-ui="enabled: false"
-    device-orientation-permission-ui="enabled: true"
-    renderer="antialias: true; alpha: true"
-  >
+  <a-assets>
+    <video
+      id="vid"
+      src="https://res.cloudinary.com/dxdq6kiso/video/upload/v1776431150/HSJ_Newspaper_video_AR_rysgta.mp4"
+      loop
+      muted
+      playsinline
+      webkit-playsinline
+      crossorigin="anonymous"
+    ></video>
+  </a-assets>
 
-    <!-- Assets -->
-    <a-assets>
-      <video
-        id="vid"
-        src="https://res.cloudinary.com/dxdq6kiso/video/upload/v1776431150/HSJ_Newspaper_video_AR_rysgta.mp4"
-        loop
-        muted
-        playsinline
-        webkit-playsinline
-        crossorigin="anonymous"
-      ></video>
-    </a-assets>
+  <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
-    <!-- Camera -->
-    <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+  <a-entity mindar-image-target="targetIndex: 0">
 
-    <!-- Image Target -->
-    <a-entity mindar-image-target="targetIndex: 0">
+    <a-video
+      src="#vid"
+      width="1.5"
+      height="0.9"
+      position="0 0.2 0"
+      material="shader: flat;"
+    ></a-video>
 
-      <!-- Video Overlay -->
-      <a-video
-        src="#vid"
-        width="1.5"
-        height="0.9"
-        position="0 0.2 0"
-      ></a-video>
+  </a-entity>
 
-    </a-entity>
+</a-scene>
 
-  </a-scene>
+<script>
+  const scene = document.querySelector("a-scene");
+  const video = document.querySelector("#vid");
 
-  <!-- Script -->
-  <script>
-    const startButton = document.querySelector("#startButton");
-    const scene = document.querySelector("a-scene");
-    const video = document.querySelector("#vid");
+  let hasPlayed = false;
 
-    startButton.addEventListener("click", async () => {
-      const mindarSystem = scene.systems["mindar-image-system"];
-      await mindarSystem.start();
-      video.play();
-      startButton.style.display = "none";
-    });
+  // 🔥 AUTO START AR
+  scene.addEventListener("loaded", async () => {
+    const mindarSystem = scene.systems["mindar-image-system"];
+    await mindarSystem.start();
 
-    scene.addEventListener("targetFound", () => {
-      video.play();
-    });
+    // Try autoplay (muted)
+    video.play().catch(() => {});
+  });
 
-    scene.addEventListener("targetLost", () => {
-      video.pause();
-    });
-  </script>
+  // 🔥 PLAY WHEN TARGET FOUND
+  scene.addEventListener("targetFound", () => {
+    video.muted = false; // try enabling sound
+    video.play();
+    hasPlayed = true;
+  });
+
+  // 🔥 PAUSE WHEN LOST
+  scene.addEventListener("targetLost", () => {
+    video.pause();
+  });
+
+  // 🔥 FALLBACK: play after 5 sec even if not scanned
+  setTimeout(() => {
+    if (!hasPlayed) {
+      video.muted = false;
+      video.play().catch(() => {
+        video.muted = true;
+        video.play();
+      });
+    }
+  }, 5000);
+</script>
 
 </body>
 </html>
