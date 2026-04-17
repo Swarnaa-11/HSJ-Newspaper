@@ -8,36 +8,51 @@
   <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.2/dist/mindar-image-aframe.prod.js"></script>
 
   <style>
-    body {
-      margin: 0;
-      overflow: hidden;
-      background: black;
-      font-family: sans-serif;
-    }
+  html, body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    height: 100%;
+    width: 100%;
+    background: black;
+  }
 
-    #startButton {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      padding: 14px 22px;
-      background: white;
-      color: black;
-      font-size: 16px;
-      border-radius: 8px;
-      z-index: 999;
-    }
+  a-scene {
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    width: 100% !important;
+    height: 100% !important;
+  }
 
-    .instructions {
-      position: fixed;
-      bottom: 20px;
-      width: 100%;
-      text-align: center;
-      color: white;
-      font-size: 14px;
-      z-index: 10;
-    }
-  </style>
+  canvas {
+    width: 100% !important;
+    height: 100% !important;
+  }
+
+  #startButton {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 14px 22px;
+    background: white;
+    color: black;
+    font-size: 16px;
+    border-radius: 8px;
+    z-index: 999;
+  }
+
+  .instructions {
+    position: fixed;
+    bottom: 20px;
+    width: 100%;
+    text-align: center;
+    color: white;
+    font-size: 14px;
+    z-index: 10;
+  }
+</style>
 </head>
 
 <body>
