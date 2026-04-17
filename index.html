@@ -1,3 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>HSJ Experience</title>
+
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      height: 100%;
+      width: 100%;
+      font-family: sans-serif;
+      background: black;
+    }
+
+    /* CAMERA */
+    #camera {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: 1;
+    }
+
+    /* VIDEO OVERLAY */
+    #overlayVideo {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 100vw;
+      height: auto;
+      max-height: 100vh;
+      object-fit: contain;
+      z-index: 2;
+      border-radius: 14px;
+    }
+
+    /* TAP SCREEN */
+    #tapLayer {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: black;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      z-index: 999;
+      text-align: center;
+      padding: 20px;
+    }
+
+    /* INSTRUCTION BOX */
+    #instructionBox {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.75);
+      color: white;
+      padding: 16px 24px;
+      border-radius: 12px;
+      font-size: 20px;
+      z-index: 3;
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+
+<!-- TAP SCREEN -->
+<div id="tapLayer">
+  Tap once and rotate phone for full experience
+</div>
+
+<!-- CAMERA -->
+<video id="camera" autoplay playsinline></video>
+
+<!-- MAIN VIDEO -->
+<video
+  id="overlayVideo"
+  src="video.mp4"
+  loop
+  playsinline
+></video>
+
+<!-- INSTRUCTION -->
+<div id="instructionBox">
+  कैमरा चालू है • वीडियो अपने आप चलेगा
+</div>
+
 <script>
   const tapLayer = document.getElementById("tapLayer");
   const camera = document.getElementById("camera");
@@ -6,10 +106,14 @@
   tapLayer.addEventListener("click", async () => {
     tapLayer.style.display = "none";
 
-    // 🔥 FORCE FULLSCREEN (required for orientation lock)
+    // 🔥 FULLSCREEN (required for landscape)
     const elem = document.documentElement;
     if (elem.requestFullscreen) {
-      await elem.requestFullscreen();
+      try {
+        await elem.requestFullscreen();
+      } catch (e) {
+        console.log("Fullscreen not allowed");
+      }
     }
 
     // 🔥 TRY LANDSCAPE LOCK
@@ -21,7 +125,7 @@
       }
     }
 
-    // START CAMERA
+    // 🔥 START CAMERA
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         video: { facingMode: "environment" },
@@ -32,7 +136,7 @@
       alert("Please allow camera access");
     }
 
-    // AUDIO FIX
+    // 🔥 AUDIO FIX (reliable method)
     try {
       overlayVideo.muted = true;
       await overlayVideo.play();
@@ -44,3 +148,6 @@
     }
   });
 </script>
+
+</body>
+</html>
