@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>AR Newspaper Experience</title>
+  <title>HSJ AR Experience</title>
 
   <!-- MindAR + A-Frame -->
   <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.2/dist/mindar-image.prod.js"></script>
@@ -13,6 +13,7 @@
       margin: 0;
       overflow: hidden;
       font-family: sans-serif;
+      background: black;
     }
 
     .instructions {
@@ -29,9 +30,9 @@
 
 <body>
 
-  <!-- Instruction Text -->
+  <!-- Instruction text -->
   <div class="instructions">
-    Scan the QR → Point camera at the newspaper
+    Point your camera at the newspaper
   </div>
 
   <!-- AR Scene -->
@@ -39,6 +40,9 @@
     mindar-image="imageTargetSrc: target.mind; autoStart: true;"
     vr-mode-ui="enabled: false"
     device-orientation-permission-ui="enabled: true"
+    embedded
+    color-space="sRGB"
+    renderer="colorManagement: true, physicallyCorrectLights"
   >
 
     <!-- Assets -->
@@ -48,6 +52,7 @@
         src="https://res.cloudinary.com/dxdq6kiso/video/upload/v1776431150/HSJ_Newspaper_video_AR_rysgta.mp4"
         loop
         muted
+        autoplay
         playsinline
         webkit-playsinline
         crossorigin="anonymous"
@@ -60,12 +65,12 @@
     <!-- Image Target -->
     <a-entity mindar-image-target="targetIndex: 0">
 
-      <!-- Video Overlay -->
+      <!-- Video overlay -->
       <a-video
         src="#vid"
-        width="1.8"
-        height="1"
-        position="0 0.3 0"
+        width="1.5"
+        height="0.9"
+        position="0 0.2 0"
       ></a-video>
 
     </a-entity>
@@ -82,6 +87,11 @@
 
     scene.addEventListener("targetLost", () => {
       video.pause();
+    });
+
+    // iOS fix: ensure video starts after interaction
+    document.body.addEventListener("click", () => {
+      video.play();
     });
   </script>
 
