@@ -1,102 +1,134 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
-  <title>AR Jewellery</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-</head>
-
-<body style="margin:0; overflow:hidden;">
-
-  <!-- Loading Screen -->
-  <div id="loading" style="
-    position: fixed;
-    top:0; left:0;
-    width:100%;
-    height:100%;
-    background:black;
-    color:white;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:18px;
-    z-index:10;
-  ">
-    Starting AR Camera...
-  </div>
-
-  <!-- Video -->
-  <video id="video" 
-    src="video.mp4" 
-    loop 
-    muted 
-    playsinline 
-    crossorigin="anonymous"
-    style="display:none;">
-  </video>
+  <meta charset="utf-8">
+  <title>HSJ AR Experience</title>
 
   <!-- Libraries -->
-  <script src="https://cdn.jsdelivr.net/npm/three@0.150.1/build/three.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-three.prod.js"></script>
+  <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.2/dist/mindar-image-aframe.prod.js"></script>
 
-  <!-- AR Script -->
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      height: 100%;
+      width: 100%;
+      background: black;
+      font-family: sans-serif;
+    }
+
+    a-scene {
+      position: fixed !important;
+      top: 0;
+      left: 0;
+      width: 100% !important;
+      height: 100% !important;
+    }
+
+    canvas {
+      width: 100% !important;
+      height: 100% !important;
+    }
+
+    #startButton {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      padding: 14px 22px;
+      background: white;
+      color: black;
+      font-size: 16px;
+      border-radius: 8px;
+      z-index: 999;
+      border: none;
+    }
+
+    .instructions {
+      position: fixed;
+      bottom: 20px;
+      width: 100%;
+      text-align: center;
+      color: white;
+      font-size: 14px;
+      z-index: 10;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Start Button -->
+  <button id="startButton">Start AR Experience</button>
+
+  <!-- Instructions -->
+  <div class="instructions">
+    Tap start → Point camera at the newspaper
+  </div>
+
+  <!-- AR Scene -->
+  <a-scene
+    mindar-image="imageTargetSrc: target.mind;"
+    embedded
+    vr-mode-ui="enabled: false"
+    device-orientation-permission-ui="enabled: true"
+    renderer="antialias: true; alpha: true"
+  >
+
+    <!-- Assets -->
+    <a-assets>
+      <video
+        id="vid"
+        src="https://res.cloudinary.com/dxdq6kiso/video/upload/v1776431150/HSJ_Newspaper_video_AR_rysgta.mp4"
+        loop
+        muted
+        playsinline
+        webkit-playsinline
+        crossorigin="anonymous"
+      ></video>
+    </a-assets>
+
+    <!-- Camera -->
+    <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+
+    <!-- Image Target -->
+    <a-entity mindar-image-target="targetIndex: 0">
+
+      <!-- Video Overlay -->
+      <a-video
+        src="#vid"
+        width="1.5"
+        height="0.9"
+        position="0 0.2 0"
+      ></a-video>
+
+    </a-entity>
+
+  </a-scene>
+
+  <!-- Script -->
   <script>
-  document.addEventListener("DOMContentLoaded", async () => {
-
-    const startButton = document.createElement("button");
-    startButton.innerText = "Start AR";
-    startButton.style.position = "absolute";
-    startButton.style.top = "50%";
-    startButton.style.left = "50%";
-    startButton.style.transform = "translate(-50%, -50%)";
-    startButton.style.padding = "15px 25px";
-    startButton.style.fontSize = "18px";
-    startButton.style.zIndex = "20";
-    document.body.appendChild(startButton);
+    const startButton = document.querySelector("#startButton");
+    const scene = document.querySelector("a-scene");
+    const video = document.querySelector("#vid");
 
     startButton.addEventListener("click", async () => {
-
+      const mindarSystem = scene.systems["mindar-image-system"];
+      await mindarSystem.start();
+      video.play();
       startButton.style.display = "none";
-
-      const mindarThree = new window.MINDAR.IMAGE.MindARThree({
-        container: document.body,
-        imageTargetSrc: "target.mind",
-      });
-
-      const {renderer, scene, camera} = mindarThree;
-
-      const anchor = mindarThree.addAnchor(0);
-
-      const video = document.querySelector("#video");
-      const texture = new THREE.VideoTexture(video);
-
-      const geometry = new THREE.PlaneGeometry(1, 1.5);
-      const material = new THREE.MeshBasicMaterial({ map: texture });
-
-      const plane = new THREE.Mesh(geometry, material);
-      plane.position.set(0, 0, 0.01);
-      anchor.group.add(plane);
-
-      anchor.onTargetFound = () => {
-        video.play();
-      };
-
-      anchor.onTargetLost = () => {
-        video.pause();
-      };
-
-      await mindarThree.start();
-
-      document.getElementById("loading").style.display = "none";
-
-      renderer.setAnimationLoop(() => {
-        renderer.render(scene, camera);
-      });
-
     });
 
-  });
-</script>
+    scene.addEventListener("targetFound", () => {
+      video.play();
+    });
+
+    scene.addEventListener("targetLost", () => {
+      video.pause();
+    });
+  </script>
 
 </body>
 </html>
