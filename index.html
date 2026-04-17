@@ -1,118 +1,64 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8">
-  <title>HSJ AR Experience</title>
-
-  <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.2/dist/mindar-image-aframe.prod.js"></script>
-
-  <style>
-  html, body {
-    margin: 0;
-    padding: 0;
-    overflow: hidden;
-    height: 100%;
-    width: 100%;
-    background: black;
-  }
-
-  a-scene {
-    position: fixed !important;
-    top: 0;
-    left: 0;
-    width: 100% !important;
-    height: 100% !important;
-  }
-
-  canvas {
-    width: 100% !important;
-    height: 100% !important;
-  }
-
-  #startButton {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    padding: 14px 22px;
-    background: white;
-    color: black;
-    font-size: 16px;
-    border-radius: 8px;
-    z-index: 999;
-  }
-
-  .instructions {
-    position: fixed;
-    bottom: 20px;
-    width: 100%;
-    text-align: center;
-    color: white;
-    font-size: 14px;
-    z-index: 10;
-  }
-</style>
+  <meta charset="UTF-8">
+  <title>AR Jewellery</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 
-<body>
+<body style="margin:0; overflow:hidden;">
 
-  <button id="startButton">Start AR Experience</button>
+  <!-- Your video -->
+  <video id="video" 
+    src="your-video.mp4" 
+    loop 
+    muted 
+    playsinline 
+    crossorigin="anonymous"
+    style="display:none;">
+  </video>
 
-  <div class="instructions">
-    Tap start → Point camera at newspaper
-  </div>
+  <!-- 🔴 THESE go HERE (before closing body) -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.150.1/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-three.prod.js"></script>
 
-  <a-scene
-    mindar-image="imageTargetSrc: target.mind;"
-    embedded
-    vr-mode-ui="enabled: false"
-    device-orientation-permission-ui="enabled: true"
-  >
-
-    <a-assets>
-      <video
-        id="vid"
-        src="https://res.cloudinary.com/dxdq6kiso/video/upload/v1776431150/HSJ_Newspaper_video_AR_rysgta.mp4"
-        loop
-        muted
-        playsinline
-        webkit-playsinline
-        crossorigin="anonymous"
-      ></video>
-    </a-assets>
-
-    <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
-
-    <a-entity mindar-image-target="targetIndex: 0">
-      <a-video
-        src="#vid"
-        width="1.5"
-        height="0.9"
-        position="0 0.2 0"
-      ></a-video>
-    </a-entity>
-
-  </a-scene>
-
+  <!-- Your AR code -->
   <script>
-    const startButton = document.querySelector("#startButton");
-    const scene = document.querySelector("a-scene");
-    const video = document.querySelector("#vid");
+    document.addEventListener("DOMContentLoaded", async () => {
 
-    startButton.addEventListener("click", async () => {
-      const mindarSystem = scene.systems["mindar-image-system"];
-      await mindarSystem.start();
-      video.play();
-      startButton.style.display = "none";
-    });
+      const mindarThree = new window.MINDAR.IMAGE.MindARThree({
+        container: document.body,
+        imageTargetSrc: "./targets.mind",
+      });
 
-    scene.addEventListener("targetFound", () => {
-      video.play();
-    });
+      const {renderer, scene, camera} = mindarThree;
 
-    scene.addEventListener("targetLost", () => {
-      video.pause();
+      const anchor = mindarThree.addAnchor(0);
+
+      const video = document.querySelector("#video");
+      const texture = new THREE.VideoTexture(video);
+
+      const geometry = new THREE.PlaneGeometry(1, 1.5); // adjust later
+      const material = new THREE.MeshBasicMaterial({ map: texture });
+
+      const plane = new THREE.Mesh(geometry, material);
+      plane.position.set(0, 0, 0.01);
+      anchor.group.add(plane);
+
+      anchor.onTargetFound = () => {
+        video.play();
+      };
+
+      anchor.onTargetLost = () => {
+        video.pause();
+      };
+
+      await mindarThree.start();
+
+      renderer.setAnimationLoop(() => {
+        renderer.render(scene, camera);
+      });
+
     });
   </script>
 
