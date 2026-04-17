@@ -14,7 +14,7 @@
       overflow: hidden;
       height: 100%;
       width: 100%;
-      background: black;
+      background: transparent;
       font-family: sans-serif;
     }
 
@@ -22,6 +22,22 @@
       position: fixed !important;
       width: 100% !important;
       height: 100% !important;
+      background: transparent !important;
+    }
+
+    #tapLayer {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: black;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      z-index: 999;
     }
 
     .instructions {
@@ -37,6 +53,8 @@
 </head>
 
 <body>
+
+<div id="tapLayer">Tap to start experience</div>
 
 <div class="instructions">
   कैमरा खुलते ही पेपर की तरफ करें
@@ -55,7 +73,6 @@
       id="vid"
       src="https://res.cloudinary.com/dxdq6kiso/video/upload/v1776431150/HSJ_Newspaper_video_AR_rysgta.mp4"
       loop
-      muted
       playsinline
       webkit-playsinline
       crossorigin="anonymous"
@@ -65,7 +82,6 @@
   <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
   <a-entity mindar-image-target="targetIndex: 0">
-
     <a-video
       src="#vid"
       width="1.5"
@@ -73,48 +89,32 @@
       position="0 0.2 0"
       material="shader: flat;"
     ></a-video>
-
   </a-entity>
 
 </a-scene>
 
 <script>
+  const tapLayer = document.querySelector("#tapLayer");
   const scene = document.querySelector("a-scene");
   const video = document.querySelector("#vid");
 
-  let hasPlayed = false;
+  tapLayer.addEventListener("click", async () => {
+    tapLayer.style.display = "none";
 
-  // 🔥 AUTO START AR
-  scene.addEventListener("loaded", async () => {
     const mindarSystem = scene.systems["mindar-image-system"];
     await mindarSystem.start();
 
-    // Try autoplay (muted)
+    video.muted = false;
     video.play().catch(() => {});
   });
 
-  // 🔥 PLAY WHEN TARGET FOUND
   scene.addEventListener("targetFound", () => {
-    video.muted = false; // try enabling sound
     video.play();
-    hasPlayed = true;
   });
 
-  // 🔥 PAUSE WHEN LOST
   scene.addEventListener("targetLost", () => {
     video.pause();
   });
-
-  // 🔥 FALLBACK: play after 5 sec even if not scanned
-  setTimeout(() => {
-    if (!hasPlayed) {
-      video.muted = false;
-      video.play().catch(() => {
-        video.muted = true;
-        video.play();
-      });
-    }
-  }, 5000);
 </script>
 
 </body>
