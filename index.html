@@ -41,11 +41,26 @@
 
   <!-- AR Script -->
   <script>
-    document.addEventListener("DOMContentLoaded", async () => {
+  document.addEventListener("DOMContentLoaded", async () => {
+
+    const startButton = document.createElement("button");
+    startButton.innerText = "Start AR";
+    startButton.style.position = "absolute";
+    startButton.style.top = "50%";
+    startButton.style.left = "50%";
+    startButton.style.transform = "translate(-50%, -50%)";
+    startButton.style.padding = "15px 25px";
+    startButton.style.fontSize = "18px";
+    startButton.style.zIndex = "20";
+    document.body.appendChild(startButton);
+
+    startButton.addEventListener("click", async () => {
+
+      startButton.style.display = "none";
 
       const mindarThree = new window.MINDAR.IMAGE.MindARThree({
         container: document.body,
-        imageTargetSrc: "./target.mind",
+        imageTargetSrc: "target.mind",
       });
 
       const {renderer, scene, camera} = mindarThree;
@@ -55,7 +70,6 @@
       const video = document.querySelector("#video");
       const texture = new THREE.VideoTexture(video);
 
-      // Adjust based on your image ratio
       const geometry = new THREE.PlaneGeometry(1, 1.5);
       const material = new THREE.MeshBasicMaterial({ map: texture });
 
@@ -64,9 +78,7 @@
       anchor.group.add(plane);
 
       anchor.onTargetFound = () => {
-        video.play().catch(() => {
-          console.log("Autoplay blocked");
-        });
+        video.play();
       };
 
       anchor.onTargetLost = () => {
@@ -75,7 +87,6 @@
 
       await mindarThree.start();
 
-      // Hide loading screen when camera starts
       document.getElementById("loading").style.display = "none";
 
       renderer.setAnimationLoop(() => {
@@ -83,7 +94,9 @@
       });
 
     });
-  </script>
+
+  });
+</script>
 
 </body>
 </html>
