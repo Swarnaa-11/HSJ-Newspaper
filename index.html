@@ -15,7 +15,7 @@
       overflow: hidden;
       height: 100%;
       width: 100%;
-      background: black;
+      background: transparent; /* ✅ FIXED */
       font-family: sans-serif;
     }
 
@@ -25,6 +25,7 @@
       left: 0;
       width: 100% !important;
       height: 100% !important;
+      background: transparent !important; /* ✅ FIXED */
     }
 
     canvas {
@@ -74,7 +75,7 @@
     embedded
     vr-mode-ui="enabled: false"
     device-orientation-permission-ui="enabled: true"
-    renderer="antialias: true; alpha: true"
+    renderer="antialias: true; alpha: true; logarithmicDepthBuffer: true;"
   >
 
     <!-- Assets -->
@@ -93,14 +94,17 @@
     <!-- Camera -->
     <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
-    <!-- Image Target -->
-    <a-entity mindar-image-target="targetIndex: 0">
+    <!-- Image Target with smoothing -->
+    <a-entity 
+      mindar-image-target="targetIndex: 0"
+      mindar-image-target-smoothing="enabled: true"
+    >
 
-      <!-- Video perfectly aligned -->
+      <!-- Slightly smaller for stability -->
       <a-video
         src="#vid"
-        width="1"
-        height="1.5"
+        width="0.9"
+        height="1.35"
         position="0 0 0"
       ></a-video>
 
