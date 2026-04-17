@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <title>HSJ AR Experience</title>
 
+  <!-- Libraries -->
   <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.2/dist/mindar-image-aframe.prod.js"></script>
 
@@ -14,14 +15,21 @@
       overflow: hidden;
       height: 100%;
       width: 100%;
-      background: transparent;
+      background: black;
+      font-family: sans-serif;
     }
 
     a-scene {
       position: fixed !important;
+      top: 0;
+      left: 0;
       width: 100% !important;
       height: 100% !important;
-      background: transparent !important;
+    }
+
+    canvas {
+      width: 100% !important;
+      height: 100% !important;
     }
 
     #startButton {
@@ -52,68 +60,75 @@
 
 <body>
 
-<button id="startButton">Start AR Experience</button>
+  <!-- Start Button -->
+  <button id="startButton">Start AR Experience</button>
 
-<div class="instructions">
-  Tap start → Point camera at the newspaper
-</div>
+  <!-- Instructions -->
+  <div class="instructions">
+    Tap start → Point camera at the newspaper
+  </div>
 
-<a-scene
-  mindar-image="imageTargetSrc: target.mind;"
-  embedded
-  vr-mode-ui="enabled: false"
-  device-orientation-permission-ui="enabled: true"
-  renderer="antialias: false; alpha: true; precision: mediump;"
->
-
-  <a-assets>
-    <video
-      id="vid"
-      src="video.mp4"
-      loop
-      muted
-      playsinline
-      webkit-playsinline
-      preload="auto"
-      crossorigin="anonymous"
-    ></video>
-  </a-assets>
-
-  <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
-
-  <a-entity 
-    mindar-image-target="targetIndex: 0"
-    mindar-image-target-smoothing="enabled: true; filterMinCF: 0.0001; filterBeta: 0.01"
+  <!-- AR Scene -->
+  <a-scene
+    mindar-image="imageTargetSrc: target.mind;"
+    embedded
+    vr-mode-ui="enabled: false"
+    device-orientation-permission-ui="enabled: true"
+    renderer="antialias: true; alpha: true"
   >
 
-    <!-- ✅ 5% increased size -->
-    <a-video
-      src="#vid"
-      width="0.9261"
-      height="0.5237"
-      position="0 0 0"
-      material="shader: flat;"
-    ></a-video>
+    <!-- Assets -->
+    <a-assets>
+      <video
+        id="vid"
+        src="https://res.cloudinary.com/dxdq6kiso/video/upload/v1776431150/HSJ_Newspaper_video_AR_rysgta.mp4"
+        loop
+        muted
+        playsinline
+        webkit-playsinline
+        crossorigin="anonymous"
+      ></video>
+    </a-assets>
 
-  </a-entity>
+    <!-- Camera -->
+    <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
-</a-scene>
+    <!-- Image Target -->
+    <a-entity mindar-image-target="targetIndex: 0">
 
-<script>
-  const startButton = document.querySelector("#startButton");
-  const scene = document.querySelector("a-scene");
-  const video = document.querySelector("#vid");
+      <!-- Video Overlay -->
+      <a-video
+        src="#vid"
+        width="1.5"
+        height="0.9"
+        position="0 0.2 0"
+      ></a-video>
 
-  startButton.addEventListener("click", async () => {
-    const mindarSystem = scene.systems["mindar-image-system"];
-    await mindarSystem.start();
-    video.play().catch(() => {});
-    startButton.style.display = "none";
-  });
+    </a-entity>
 
-  scene.addEventListener("targetFound", () => video.play());
-  scene.addEventListener("targetLost", () => video.pause());
-</script>
+  </a-scene>
+
+  <!-- Script -->
+  <script>
+    const startButton = document.querySelector("#startButton");
+    const scene = document.querySelector("a-scene");
+    const video = document.querySelector("#vid");
+
+    startButton.addEventListener("click", async () => {
+      const mindarSystem = scene.systems["mindar-image-system"];
+      await mindarSystem.start();
+      video.play();
+      startButton.style.display = "none";
+    });
+
+    scene.addEventListener("targetFound", () => {
+      video.play();
+    });
+
+    scene.addEventListener("targetLost", () => {
+      video.pause();
+    });
+  </script>
 
 </body>
 </html>
