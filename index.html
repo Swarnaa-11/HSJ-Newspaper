@@ -15,7 +15,7 @@
       overflow: hidden;
       height: 100%;
       width: 100%;
-      background: transparent; /* ✅ FIXED */
+      background: transparent;
       font-family: sans-serif;
     }
 
@@ -25,7 +25,7 @@
       left: 0;
       width: 100% !important;
       height: 100% !important;
-      background: transparent !important; /* ✅ FIXED */
+      background: transparent !important;
     }
 
     canvas {
@@ -75,7 +75,7 @@
     embedded
     vr-mode-ui="enabled: false"
     device-orientation-permission-ui="enabled: true"
-    renderer="antialias: true; alpha: true; logarithmicDepthBuffer: true;"
+    renderer="antialias: false; alpha: true; precision: mediump;"
   >
 
     <!-- Assets -->
@@ -87,6 +87,7 @@
         muted
         playsinline
         webkit-playsinline
+        preload="auto"
         crossorigin="anonymous"
       ></video>
     </a-assets>
@@ -100,11 +101,11 @@
       mindar-image-target-smoothing="enabled: true"
     >
 
-      <!-- Slightly smaller for stability -->
+      <!-- ✅ PERFECT ASPECT RATIO (25:14.13 ≈ 1.77) -->
       <a-video
         src="#vid"
-        width="0.9"
-        height="1.35"
+        width="1.77"
+        height="1"
         position="0 0 0"
       ></a-video>
 
