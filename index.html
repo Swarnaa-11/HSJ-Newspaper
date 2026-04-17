@@ -81,7 +81,7 @@
     <a-assets>
       <video
         id="vid"
-        src="https://res.cloudinary.com/dxdq6kiso/video/upload/v1776431150/HSJ_Newspaper_video_AR_rysgta.mp4"
+        src="video.mp4"
         loop
         muted
         playsinline
@@ -96,12 +96,12 @@
     <!-- Image Target -->
     <a-entity mindar-image-target="targetIndex: 0">
 
-      <!-- Video Overlay -->
+      <!-- Video perfectly aligned -->
       <a-video
         src="#vid"
-        width="1.5"
-        height="0.9"
-        position="0 0.2 0"
+        width="1"
+        height="1.5"
+        position="0 0 0"
       ></a-video>
 
     </a-entity>
@@ -116,8 +116,13 @@
 
     startButton.addEventListener("click", async () => {
       const mindarSystem = scene.systems["mindar-image-system"];
+
       await mindarSystem.start();
-      video.play();
+
+      video.play().catch(() => {
+        console.log("Autoplay blocked");
+      });
+
       startButton.style.display = "none";
     });
 
