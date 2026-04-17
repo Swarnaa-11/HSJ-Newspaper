@@ -8,9 +8,26 @@
 
 <body style="margin:0; overflow:hidden;">
 
-  <!-- Your video -->
+  <!-- Loading Screen -->
+  <div id="loading" style="
+    position: fixed;
+    top:0; left:0;
+    width:100%;
+    height:100%;
+    background:black;
+    color:white;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:18px;
+    z-index:10;
+  ">
+    Starting AR Camera...
+  </div>
+
+  <!-- Video -->
   <video id="video" 
-    src="HSJ_Newspaper video AR.mp4" 
+    src="video.mp4" 
     loop 
     muted 
     playsinline 
@@ -18,11 +35,11 @@
     style="display:none;">
   </video>
 
-  <!-- 🔴 THESE go HERE (before closing body) -->
+  <!-- Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/three@0.150.1/build/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-three.prod.js"></script>
 
-  <!-- Your AR code -->
+  <!-- AR Script -->
   <script>
     document.addEventListener("DOMContentLoaded", async () => {
 
@@ -38,7 +55,8 @@
       const video = document.querySelector("#video");
       const texture = new THREE.VideoTexture(video);
 
-      const geometry = new THREE.PlaneGeometry(1, 1.5); // adjust later
+      // Adjust based on your image ratio
+      const geometry = new THREE.PlaneGeometry(1, 1.5);
       const material = new THREE.MeshBasicMaterial({ map: texture });
 
       const plane = new THREE.Mesh(geometry, material);
@@ -46,7 +64,9 @@
       anchor.group.add(plane);
 
       anchor.onTargetFound = () => {
-        video.play();
+        video.play().catch(() => {
+          console.log("Autoplay blocked");
+        });
       };
 
       anchor.onTargetLost = () => {
@@ -54,6 +74,9 @@
       };
 
       await mindarThree.start();
+
+      // Hide loading screen when camera starts
+      document.getElementById("loading").style.display = "none";
 
       renderer.setAnimationLoop(() => {
         renderer.render(scene, camera);
